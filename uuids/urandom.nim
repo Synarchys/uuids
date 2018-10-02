@@ -48,11 +48,12 @@ template urandomImpl() =
       raise newException(OSError, "Call to CryptGenRandom failed")
 
   when defined(js):
-    proc random(): float {.importc: "Math.random()".}
-    proc floor(n: float): uint8 {.importc: "Math.floor(#)".}
-    for i in 0..size:
-      result[i] = floor(random() * 256)
-      
+    proc random(): float {.importc: "Math.random".}
+    proc floor(n: float): uint8 {.importcpp: "Math.floor(#)".} 
+    for i in 0..size - 1:
+      var r = random() * 256
+      result[i] = uint8(floor(r))
+
   else:
     var file: File
     if not file.open("/dev/urandom"):
